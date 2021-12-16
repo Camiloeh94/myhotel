@@ -10,6 +10,7 @@ import com.camilo.humanresources.service.EmployeeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -86,12 +87,15 @@ public class EmployeeServiceImpl implements EmployeeService {
         ));
 
         uniqueManagerId.stream().forEach(e -> {
-            if(e.getManagerId() == null || e.getManagerId() == Double.valueOf(0)) {
+            if(e.getManagerId() == null || e.getManagerId() == 0.0) {
                 managers.add(e);
             } else {
                 managers.add(employeeRepository.findById(e.getManagerId()).get());
             }
         });
+
+        managers.removeIf(m -> m.getHireDate().compareTo(LocalDateTime.now().minusYears(15L)) > 0);
+
         return managers;
     }
 }
